@@ -8,8 +8,14 @@ import * as S from "./style";
 
 const UserList = ({ users, isLoading, onCountryChange }) => {
   const [hoveredUserId, setHoveredUserId] = useState();
+  const [favorites, setFavorites] = useState([]);
 
-  console.dir(users)
+  useEffect(() => {
+    const localFavorites = localStorage.getItem("favorites");
+    localFavorites && setFavorites(JSON.parse(localFavorites));
+  }, []);
+
+  console.dir(users);
 
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
@@ -18,6 +24,14 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
   const handleMouseLeave = () => {
     setHoveredUserId();
   };
+
+  const toggleFavorite = (index) => {
+    const newFavorites = [...favorites, users[index]];
+    setFavorites(newFavorites);
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+  };
+
+  console.log(favorites);
 
   return (
     <S.UserList>
@@ -35,6 +49,7 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
               key={index}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
+              onClick={() => toggleFavorite(index)}
             >
               <S.UserPicture src={user?.picture.large} alt="" />
               <S.UserInfo>
