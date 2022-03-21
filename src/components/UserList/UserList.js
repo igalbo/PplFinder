@@ -12,7 +12,7 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
 
   useEffect(() => {
     const localFavorites = localStorage.getItem("favorites");
-    localFavorites && setFavorites(JSON.parse(localFavorites));
+    Array.isArray(localFavorites) && setFavorites(JSON.parse(localFavorites)); // Checking if localstorage's "favorites" is an array, to avoid any existing unexpected tokens
   }, []);
 
   console.dir(users);
@@ -26,10 +26,20 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
   };
 
   const toggleFavorite = (index) => {
-    const newFavorites = [...favorites, users[index]];
-    setFavorites(newFavorites);
-    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    if (!isInFavorites(index)) {
+      const newFavorites = [...favorites, users[index]];
+      setFavorites(newFavorites);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    } else {
+      const newFavorites = favorites.filter((user) => user != users[index]);
+      setFavorites(newFavorites);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    }
+
+    // I know it looks ugly, will try to refactor later
   };
+
+  const isInFavorites = (index) => favorites.includes(users[index]);
 
   console.log(favorites);
 
@@ -64,7 +74,9 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
                   {user?.location.city} {user?.location.country}
                 </Text>
               </S.UserInfo>
-              <S.IconButtonWrapper isVisible={index === hoveredUserId}>
+              <S.IconButtonWrapper
+                isVisible={index === hoveredUserId || isInFavorites(index)}
+              >
                 <IconButton>
                   <FavoriteIcon color="error" />
                 </IconButton>
