@@ -1,25 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import Text from "components/Text";
 import UserList from "components/UserList";
 import { usePeopleFetch } from "hooks";
 import * as S from "./style";
-import { useState } from "react";
 
 const Home = () => {
-  const [countryList, setCountryList] = useState([])
+  const [countryList, setCountryList] = useState([]);
   const { users, isLoading } = usePeopleFetch(countryList);
 
   const toggleCountry = (country) => {
     if (countryList.includes(country)) {
-      const newCountryList = countryList.filter((existingCountry) => existingCountry != country)
-      setCountryList(newCountryList)
+      const newCountryList = countryList.filter(
+        (existingCountry) => existingCountry != country
+      );
+      setCountryList(newCountryList);
     } else {
       const newCountryList = [...countryList, country];
-      setCountryList(newCountryList)
+      setCountryList(newCountryList);
     }
-  }
+  };
 
-  console.log(countryList)
+  console.log(countryList);
 
   return (
     <S.Home>
