@@ -11,8 +11,13 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    const localFavorites = localStorage.getItem("favorites");
-    Array.isArray(localFavorites) && setFavorites(JSON.parse(localFavorites)); // Checking if localstorage's "favorites" is an array, to avoid any existing unexpected tokens
+    try {
+      // Checking if localstorage's "favorites" is valid
+      const localFavorites = JSON.parse(localStorage.getItem("favorites"));
+      localFavorites && setFavorites(localFavorites); // Checking if localstorage's "favorites" is valid
+    } catch (e) {
+      console.log("Local storage JSON error", e);
+    }
   }, []);
 
   console.dir(users);
@@ -26,17 +31,12 @@ const UserList = ({ users, isLoading, onCountryChange }) => {
   };
 
   const toggleFavorite = (index) => {
-    if (!isInFavorites(index)) {
-      const newFavorites = [...favorites, users[index]];
-      setFavorites(newFavorites);
-      localStorage.setItem("favorites", JSON.stringify(newFavorites));
-    } else {
-      const newFavorites = favorites.filter((user) => user != users[index]);
-      setFavorites(newFavorites);
-      localStorage.setItem("favorites", JSON.stringify(newFavorites));
-    }
+    const newFavorites = isInFavorites(index)
+      ? favorites.filter((user) => user != users[index])
+      : [...favorites, users[index]];
 
-    // I know it looks ugly, will try to refactor later
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    setFavorites(newFavorites);
   };
 
   const isInFavorites = (index) => favorites.includes(users[index]);
