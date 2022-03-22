@@ -44,6 +44,9 @@ export const IconButtonWrapper = styled.div`
   display: flex;
   flex-direction: column;
   opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+  &:hover {
+    opacity: 1;
+  }
   transition: opacity 0.2s ease-in-out;
 `;
 

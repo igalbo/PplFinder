@@ -20,8 +20,6 @@ const Home = () => {
     }
   };
 
-  console.log(countryList);
-
   return (
     <S.Home>
       <S.Content>

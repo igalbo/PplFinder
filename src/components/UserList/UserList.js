@@ -7,35 +7,22 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
 
 const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
-  const [hoveredUserId, setHoveredUserId] = useState();
   const [favorites, setFavorites] = useState([]);
-  if (isFavList) {
-    users = favorites;
-  }
+  isFavList && (users = favorites);
 
   useEffect(() => {
+    // Wrapping in try-catch for a case where localstorage's "favorites" is invalid
     try {
-      // Checking if localstorage's "favorites" is valid
       const localFavorites = JSON.parse(localStorage.getItem("favorites"));
-      localFavorites && setFavorites(localFavorites); // Checking if localstorage's "favorites" is valid
+      localFavorites && setFavorites(localFavorites);
     } catch (e) {
       console.log("Local storage JSON error", e);
     }
   }, []);
 
-  console.dir(users);
-
-  const handleMouseEnter = (index) => {
-    setHoveredUserId(index);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredUserId();
-  };
-
   const toggleFavorite = (index) => {
     const newFavorites =
-      isInFavorites(index) || isFavList
+      isFavList || isInFavorites(index)
         ? favorites.filter((user) => user != users[index])
         : [...favorites, users[index]];
 
@@ -44,8 +31,6 @@ const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
   };
 
   const isInFavorites = (index) => favorites.includes(users[index]);
-
-  console.log(favorites);
 
   return (
     <S.UserList>
@@ -61,12 +46,7 @@ const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
       <S.List>
         {users.map((user, index) => {
           return (
-            <S.User
-              key={index}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
-              onClick={() => toggleFavorite(index)}
-            >
+            <S.User key={index} onClick={() => toggleFavorite(index)}>
               <S.UserPicture src={user?.picture.large} alt="" />
               <S.UserInfo>
                 <Text size="22px" bold>
@@ -80,9 +60,7 @@ const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
                   {user?.location.city} {user?.location.country}
                 </Text>
               </S.UserInfo>
-              <S.IconButtonWrapper
-                isVisible={index === hoveredUserId || isInFavorites(index) || isFavList}
-              >
+              <S.IconButtonWrapper isVisible={isInFavorites(index)}>
                 <IconButton>
                   <FavoriteIcon color="error" />
                 </IconButton>
