@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   const [value, setValue] = useState(window.location.hash === "#/" ? 0 : 1);
@@ -19,8 +20,8 @@ const NavBar = () => {
         indicatorColor="primary"
         textColor="primary"
       >
-        <Tab label="Home" index={0} href="/#/" />
-        <Tab label="Favorites" index={1} href="/#/favorites" />
+        <Tab component={Link} label="Home" index={0} to="/" />
+        <Tab component={Link} label="Favorites" index={1} to="/favorites" />
       </Tabs>
     </AppBar>
   );
