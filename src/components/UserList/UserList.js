@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Text from "components/Text";
 import Spinner from "components/Spinner";
 import CheckBox from "components/CheckBox";
@@ -6,9 +6,21 @@ import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
 
-const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
+const UserList = ({ users, isLoading, onCountryChange, isFavList, getNextPage }) => {
   const [favorites, setFavorites] = useState([]);
   isFavList && (users = favorites);
+
+  const observer = useRef();
+  const lastUserRef = useCallback((node) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        getNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  });
 
   useEffect(() => {
     // Wrapping in try-catch for a case where localstorage's "favorites" is invalid
@@ -31,6 +43,7 @@ const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
   };
 
   const isInFavorites = (index) => favorites.includes(users[index]);
+  const isLastItem = (index) => !isFavList && index === users.length - 1;
 
   return (
     <S.UserList>
@@ -46,7 +59,11 @@ const UserList = ({ users, isLoading, onCountryChange, isFavList }) => {
       <S.List>
         {users.map((user, index) => {
           return (
-            <S.User key={index} onClick={() => toggleFavorite(index)}>
+            <S.User
+              key={index}
+              onClick={() => toggleFavorite(index)}
+              ref={isLastItem(index) ? lastUserRef : null}
+            >
               <S.UserPicture src={user?.picture.large} alt="" />
               <S.UserInfo>
                 <Text size="22px" bold>
